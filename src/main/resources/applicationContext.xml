@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+        <!--    关联数据库配置文件-->
+        <context:property-placeholder location="classpath:db.properties"/>
+
+        <!--        添加数据源-->
+        <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+            <property name="driverClass" value="${jdbc.driver}"/>
+            <property name="jdbcUrl" value="${jdbc.url}"/>
+            <property name="user" value="${jdbc.username}"/>
+            <property name="password" value="${jdbc.password}"/>
+         </bean>
+        <!--        配置sqlSessionFactory用来获取数据库的连接-->
+        <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+            <property name="dataSource" ref="dataSource"/>
+            <!--            mapper映射文件的位置-->
+            <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+            <!--            mybatis配置文件的位置-->
+            <property name="configLocation" value="classpath:mybatis-config.xml"/>
+         </bean>
+
+        <!--        开启dao层包扫描，将dao包里面的接口交给Spring管理-->
+        <bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+            <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+            <property name="basePackage" value="com.example.ssm.dao"/>
+        </bean>
+        <!--开启注解的扫描，希望处理service和dao，controller不需要Spring框架去处理-->
+        <context:component-scan base-package="com.example.ssm">
+            <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        </context:component-scan>
+        <!-- spring事务管理 -->
+        <bean id="dataSourceTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+            <property name="dataSource" ref="dataSource"/>
+        </bean>
+        <!-- 开启基于注解的事务 -->
+        <tx:annotation-driven transaction-manager="dataSourceTransactionManager"/>
+</beans>
