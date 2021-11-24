@@ -1,5 +1,0 @@
-com/example/ssm/controller/BookController.class
-com/example/ssm/service/BookServiceImpl.class
-com/example/ssm/dao/BooksMapper.class
-com/example/ssm/service/BookService.class
-com/example/ssm/pojo/Books.class
